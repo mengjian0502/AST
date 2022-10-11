@@ -86,7 +86,7 @@ class NM_Mask(Mask):
             self.name2zerogrp[name] = group - nzgrp
 
 
-    def pruning(self, step, bidx):
+    def pruning(self, step, bidx, cnt):
         """
         Step 1: Scheduled N:M pruning
         """
@@ -106,7 +106,7 @@ class NM_Mask(Mask):
 
             # update mask
             self.update_mask(self.curr_prob)
-            self.apply_mask()
+            self.apply_mask(cnt)
         
         # sparsity stats
         total_params, spars_params = self._param_stats()
@@ -115,7 +115,7 @@ class NM_Mask(Mask):
         # print("Sparsity after pruning at step [{}] = {:3f}".format(bidx, sparsity*100))
         print("Sparsity after pruning at step [{}] = {:.3f} with prob={:.3f}".format(bidx, sparsity*100, self.curr_prob))
 
-    def prune_and_regrow(self, step):
+    def prune_and_regrow(self, step, cnt):
         
         # layer statistics 
         self.structured_layer_stats()
@@ -131,7 +131,7 @@ class NM_Mask(Mask):
                 # self.pruning_count[n] = int(self.name2nonzeros[n] - new_mask.sum().item())
 
                 # regrow
-                new_mask, remained = self.grp_grad_growth(new_mask, self.pruning_count[n], weight)
+                new_mask, remained = self.grp_grad_growth(new_mask, self.pruning_count[n], weight, n)
 
                 # apply mask
                 if num_remove > 0:
@@ -183,8 +183,8 @@ class NM_Mask(Mask):
                 w_b = w_b.reshape(weight.shape)
         return w_b, num_remove
 
-    def grp_grad_growth(self, new_mask, total_regrowth, weight):
-        grad = self.get_gradient_for_weights(weight)
+    def grp_grad_growth(self, new_mask, total_regrowth, weight, name):
+        grad = self.get_gradient_for_weights(weight, name)
         group = self._get_groups(grad)
         
         # gradient group

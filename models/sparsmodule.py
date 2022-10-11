@@ -15,8 +15,8 @@ class SparsConv2d(nn.Conv2d):
         
         if self.uspars:
             for n in range(nspars):
-                # self.register_buffer(f'mask{n}', torch.ones_like(self.weight))
-                self.register_parameter(f'mask{n}', nn.Parameter(torch.ones_like(self.weight), requires_grad=False))
+                self.register_buffer(f'mask{n}', torch.ones_like(self.weight).cuda())
+                # self.register_parameter(f'mask{n}', nn.Parameter(torch.ones_like(self.weight), requires_grad=False))  # for imagenet (multi-gpu)
             # initialize weight mask
             self._switch(0)
         else:

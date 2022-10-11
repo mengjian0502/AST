@@ -1,0 +1,14 @@
+save/
+data/
+__pycache__/
+.vscode/
+pretrained/
+*.swp
+*.pt
+*.ipynb
+*.png
+*.zip
+.ipynb_checkpoints
+*.pyc
+*.csv
+wandb/
